@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DronePizza - Levering og Droner</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+<h1>DronePizza - Levering og Droner</h1>
+
+<section>
+    <h2>Leveringsliste</h2>
+    <table>
+        <thead>
+        <tr>
+            <th>Levering ID</th>
+            <th>Adresse</th>
+            <th>Pizza</th>
+            <th>Status</th>
+            <th>Handlinger</th>
+        </tr>
+        </thead>
+        <tbody id="delivery-list"></tbody>
+    </table>
+</section>
+
+<section>
+    <h2>Droner</h2>
+    <div id="drone-list"></div>
+    <button id="add-drone-btn">Tilføj Drone</button>
+</section>
+
+<section>
+    <h2>Opret Levering</h2>
+    <form id="add-delivery-form">
+        <label for="pizzaName">Pizza Navn:</label>
+        <select id="pizzaName" required>
+            <option value="Margarita">Margarita</option>
+            <option value="Pepperoni">Pepperoni</option>
+            <option value="Hawaii">Hawaii</option>
+            <option value="Vegetar">Vegetar</option>
+            <option value="Bolognese">Bolognese</option>
+        </select><br>
+        <label for="address">Adresse:</label>
+        <input type="text" id="address" required><br>
+        <button type="submit">Opret Levering</button>
+    </form>
+</section>
+
+<script src="../js/script.js"></script>
+</body>
+</html>
