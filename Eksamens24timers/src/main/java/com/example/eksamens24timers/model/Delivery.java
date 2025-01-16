@@ -2,6 +2,8 @@ package com.example.eksamens24timers.model;
 
 import jakarta.persistence.*;
 import jakarta.persistence.*;
+
+import java.time.LocalDateTime;
 import java.util.*;
 
 import java.util.ArrayList;
@@ -23,8 +25,8 @@ public class Delivery {
     private Pizza pizza;
 
     private String address;
-    private Date expectedDeliveryTime;
-    private Date actualDeliveryTime;
+    private LocalDateTime expectedDeliveryTime;
+    private LocalDateTime actualDeliveryTime;
 
     public Long getId() {
         return id;
@@ -58,19 +60,19 @@ public class Delivery {
         this.address = address;
     }
 
-    public Date getExpectedDeliveryTime() {
+    public LocalDateTime getExpectedDeliveryTime() {
         return expectedDeliveryTime;
     }
 
-    public void setExpectedDeliveryTime(Date expectedDeliveryTime) {
+    public void setExpectedDeliveryTime(LocalDateTime expectedDeliveryTime) {
         this.expectedDeliveryTime = expectedDeliveryTime;
     }
 
-    public Date getActualDeliveryTime() {
+    public LocalDateTime getActualDeliveryTime() {
         return actualDeliveryTime;
     }
 
-    public void setActualDeliveryTime(Date actualDeliveryTime) {
+    public void setActualDeliveryTime(LocalDateTime actualDeliveryTime) {
         this.actualDeliveryTime = actualDeliveryTime;
     }
 }

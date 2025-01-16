@@ -15,17 +15,20 @@ public class Drone {
     @Column(unique = true, nullable = false)
     private UUID serialNumber;
 
-    @Enumerated(EnumType.STRING)
-    private Status status;
-
     @ManyToOne
     private Station station;
 
     @OneToMany(mappedBy = "drone", cascade = CascadeType.ALL)
     private List<Delivery> deliveries = new ArrayList<>();
 
-    public enum Status {
-        IN_OPERATION, OUT_OF_OPERATION, RETIRED
+    @Enumerated(EnumType.STRING)
+    private DroneStatus status;
+
+    public DroneStatus getStatus() {
+        return status;
+    }
+    public void setStatus(DroneStatus status) {
+        this.status = status;
     }
 
     public Long getId() {
@@ -44,13 +47,7 @@ public class Drone {
         this.serialNumber = serialNumber;
     }
 
-    public Status getStatus() {
-        return status;
-    }
 
-    public void setStatus(Status status) {
-        this.status = status;
-    }
 
     public Station getStation() {
         return station;
@@ -63,6 +60,7 @@ public class Drone {
     public List<Delivery> getDeliveries() {
         return deliveries;
     }
+
 
     public void setDeliveries(List<Delivery> deliveries) {
         this.deliveries = deliveries;
