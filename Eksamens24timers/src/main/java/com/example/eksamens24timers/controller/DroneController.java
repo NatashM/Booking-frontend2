@@ -15,7 +15,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/drones")
-@CrossOrigin("*")
+@CrossOrigin("http://localhost:63342")
 public class DroneController {
 
 

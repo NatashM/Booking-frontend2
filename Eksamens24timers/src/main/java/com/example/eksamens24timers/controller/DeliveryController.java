@@ -10,7 +10,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/deliveries")
-@CrossOrigin("*")
+@CrossOrigin("http://localhost:63342")
 public class DeliveryController {
 
     @Autowired

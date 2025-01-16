@@ -1,5 +1,6 @@
 package com.example.eksamens24timers.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 
 import java.util.ArrayList;
@@ -17,6 +18,8 @@ public class Drone {
 
 
     @ManyToOne
+    @JoinColumn(name = "station_id")
+    @JsonBackReference
     private Station station;
 
     @OneToMany(mappedBy = "drone", cascade = CascadeType.ALL)
@@ -24,6 +27,13 @@ public class Drone {
 
     @Enumerated(EnumType.STRING)
     private DroneStatus status;
+
+    public Drone(UUID uuid, DroneStatus droneStatus, Station chosenStation) {
+    }
+
+    public Drone() {
+
+    }
 
     public DroneStatus getStatus() {
         return status;

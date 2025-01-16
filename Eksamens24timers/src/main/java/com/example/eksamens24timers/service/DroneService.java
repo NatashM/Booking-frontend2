@@ -8,6 +8,7 @@ import com.example.eksamens24timers.repository.StationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -25,20 +26,20 @@ public class DroneService {
         return droneRepository.findAll();
     }
 
-
     public Drone addDrone() {
-        Optional<Station> station = stationRepository.findStationWithFewestDrones();
-        if (station.isPresent()) {
-            Drone drone = new Drone();
-            drone.setSerialNumber(UUID.randomUUID());
-            drone.setStation(station.get());
-            drone.setStatus(DroneStatus.IN_OPERATION);
-            return droneRepository.save(drone);
-        } else {
-            throw new RuntimeException("No stations available to assign a drone.");
+        List<Station> stations = stationRepository.findAll();
+        if (stations.isEmpty()) {
+            throw new IllegalStateException("Ingen stationer tilgængelige for at tilføje en drone.");
         }
-    }
 
+        Station chosenStation = stations.stream()
+                .min(Comparator.comparingInt(station -> station.getDrones().size()))
+                .orElseThrow();
+
+        Drone newDrone = new Drone(UUID.randomUUID(), DroneStatus.IN_OPERATION, chosenStation);
+        droneRepository.save(newDrone);
+        return newDrone;
+    }
     public void updateDroneStatus(Long serialNumber, DroneStatus status) {
         Drone drone = droneRepository.findById(serialNumber)
                 .orElseThrow(() -> new RuntimeException("Drone not found"));
