@@ -1,6 +1,7 @@
 package com.example.eksamens24timers.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
 import java.util.ArrayList;
@@ -13,7 +14,7 @@ public class Drone {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true, nullable = true)
+    @Column(unique = true, nullable = false)
     private UUID serialNumber;
 
 
@@ -23,17 +24,22 @@ public class Drone {
     private Station station;
 
     @OneToMany(mappedBy = "drone", cascade = CascadeType.ALL)
+    @JsonManagedReference
     private List<Delivery> deliveries = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
     private DroneStatus status;
 
     public Drone(UUID uuid, DroneStatus droneStatus, Station chosenStation) {
+        this.serialNumber = uuid != null ? uuid : UUID.randomUUID();
+        this.status = droneStatus;
+        this.station = chosenStation;
     }
 
     public Drone() {
 
     }
+
 
     public DroneStatus getStatus() {
         return status;
@@ -76,4 +82,6 @@ public class Drone {
     public void setDeliveries(List<Delivery> deliveries) {
         this.deliveries = deliveries;
     }
+
+
 }

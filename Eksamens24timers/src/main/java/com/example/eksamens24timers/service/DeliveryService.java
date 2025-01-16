@@ -35,15 +35,20 @@ public class DeliveryService {
         return deliveryRepository.findByDroneIsNull();
     }
 
-    public Delivery addDelivery(Long pizzaId, String address) {
-        Pizza pizza = pizzaRepository.findById(pizzaId)
+    public Delivery addDelivery(String title, String address) {
+        // Fetch the pizza from the repository using pizzaName
+        Pizza pizza = pizzaRepository.findByTitle(title)
                 .orElseThrow(() -> new RuntimeException("Pizza not found"));
 
+        // Create a new Delivery object and set the pizza and address
         Delivery delivery = new Delivery();
         delivery.setPizza(pizza);
         delivery.setAddress(address);
+
+        // Set the expected delivery time to 30 minutes from now
         delivery.setExpectedDeliveryTime(LocalDateTime.now().plusMinutes(30));
 
+        // Save the delivery object in the repository and return it
         return deliveryRepository.save(delivery);
     }
 

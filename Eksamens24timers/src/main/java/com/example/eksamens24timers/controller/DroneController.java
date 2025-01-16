@@ -1,5 +1,6 @@
 package com.example.eksamens24timers.controller;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -19,37 +20,43 @@ import java.util.UUID;
 public class DroneController {
 
 
-        @Autowired
-        private DroneService droneService;
+    @Autowired
+    private DroneService droneService;
 
-        @GetMapping
-        public List<Drone> getAllDrones() {
-            return droneService.getAllDrones();
-        }
+    @GetMapping
+    public ResponseEntity<List<Drone>> getAllDrones() {
+        List<Drone> drones = droneService.getAllDrones();
+        return ResponseEntity.ok(drones);
+    }
 
-        @PostMapping("/add")
-        public Drone addDrone() {
-            return droneService.addDrone();
-        }
+    @PostMapping("/add")
+    public ResponseEntity<Drone> addDrone() {
+        Drone drone = droneService.addDrone();
+        return ResponseEntity.status(HttpStatus.CREATED).body(drone);
+    }
 
-        @PostMapping("/enable")
-        public void enableDrone(@RequestParam Long serialNumber) {
-            droneService.updateDroneStatus(serialNumber, DroneStatus.IN_OPERATION);
-        }
+    @PostMapping("/enable")
+    public ResponseEntity<Void> enableDrone(@RequestParam Long serialNumber) {
+        droneService.updateDroneStatus(serialNumber, DroneStatus.IN_OPERATION);
+        return ResponseEntity.ok().build();
+    }
 
-        @PostMapping("/disable")
-        public void disableDrone(@RequestParam Long serialNumber) {
-            droneService.updateDroneStatus(serialNumber, DroneStatus.OUT_OF_OPERATION);
-        }
+    @PostMapping("/disable")
+    public ResponseEntity<Void> disableDrone(@RequestParam Long serialNumber) {
+        droneService.updateDroneStatus(serialNumber, DroneStatus.OUT_OF_OPERATION);
+        return ResponseEntity.ok().build();
+    }
 
-        @PostMapping("/retire")
-        public void retireDrone(@RequestParam Long serialNumber) {
-            droneService.updateDroneStatus(serialNumber, DroneStatus.RETIRED);
-        }
+    @PostMapping("/retire")
+    public ResponseEntity<Void> retireDrone(@RequestParam Long serialNumber) {
+        droneService.updateDroneStatus(serialNumber, DroneStatus.RETIRED);
+        return ResponseEntity.ok().build();
+    }
 
     @GetMapping("/{id}")
-    public Drone getDroneById(@PathVariable Long id) {
-        return droneService.getDroneById(id);
+    public ResponseEntity<Drone> getDroneById(@PathVariable Long id) {
+        Drone drone = droneService.getDroneById(id);
+        return ResponseEntity.ok(drone);
     }
 
 

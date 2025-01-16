@@ -1,5 +1,6 @@
 package com.example.eksamens24timers.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import jakarta.persistence.*;
 
@@ -19,6 +20,7 @@ public class Delivery {
     private Long id;
 
     @ManyToOne
+    @JsonBackReference
     private Drone drone;
 
     @ManyToOne

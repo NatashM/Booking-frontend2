@@ -1,8 +1,11 @@
 package com.example.eksamens24timers.controller;
 
+import com.example.eksamens24timers.dto.DeliveryRequest;
 import com.example.eksamens24timers.model.Delivery;
 import com.example.eksamens24timers.service.DeliveryService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -12,38 +15,46 @@ import java.util.UUID;
 @RequestMapping("/deliveries")
 @CrossOrigin("http://localhost:63342")
 public class DeliveryController {
-
     @Autowired
     private DeliveryService deliveryService;
 
     @GetMapping
-    public List<Delivery> getAllDeliveries() {
-        return deliveryService.getAllDeliveries();
+    public ResponseEntity<List<Delivery>> getAllDeliveries() {
+        List<Delivery> deliveries = deliveryService.getAllDeliveries();
+        return ResponseEntity.ok(deliveries);
     }
 
     @GetMapping("/queue")
-    public List<Delivery> getDeliveriesWithoutDrone() {
-        return deliveryService.getDeliveriesWithoutDrone();
+    public ResponseEntity<List<Delivery>> getDeliveriesWithoutDrone() {
+        List<Delivery> deliveries = deliveryService.getDeliveriesWithoutDrone();
+        return ResponseEntity.ok(deliveries);
     }
 
     @PostMapping("/add")
-    public Delivery addDelivery(@RequestParam Long pizzaId, @RequestParam String address) {
-        return deliveryService.addDelivery(pizzaId, address);
+    public ResponseEntity<Delivery> addDelivery(@RequestBody DeliveryRequest deliveryRequest) {
+        // Handle the pizzaName instead of pizzaId
+        Delivery savedDelivery = deliveryService.addDelivery(deliveryRequest.getPizzaName(), deliveryRequest.getAddress());
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedDelivery);
     }
 
+
+
     @PostMapping("/schedule")
-    public Delivery scheduleDelivery(@RequestParam Long deliveryId, @RequestParam(required = true) Long droneSerialNumber) {
-        return deliveryService.scheduleDelivery(deliveryId, droneSerialNumber);
+    public ResponseEntity<Delivery> scheduleDelivery(@RequestParam Long deliveryId, @RequestParam Long droneSerialNumber) {
+        Delivery scheduledDelivery = deliveryService.scheduleDelivery(deliveryId, droneSerialNumber);
+        return ResponseEntity.ok(scheduledDelivery);
     }
 
     @PostMapping("/finish")
-    public void finishDelivery(@RequestParam Long deliveryId) {
+    public ResponseEntity<Void> finishDelivery(@RequestParam Long deliveryId) {
         deliveryService.finishDelivery(deliveryId);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/{id}")
-    public Delivery getDeliveryById(@PathVariable Long id) {
-        return deliveryService.getDeliveryById(id);
+    public ResponseEntity<Delivery> getDeliveryById(@PathVariable Long id) {
+        Delivery delivery = deliveryService.getDeliveryById(id);
+        return ResponseEntity.ok(delivery);
     }
 
 }
