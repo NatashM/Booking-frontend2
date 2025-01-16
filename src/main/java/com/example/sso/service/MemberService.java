@@ -5,6 +5,7 @@ import com.example.sso.model.MembershipType;
 import com.example.sso.model.Department;
 import com.example.sso.repository.MemberRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,6 +16,12 @@ public class MemberService {
 
     @Autowired
     private MemberRepository memberRepository;
+
+    @Autowired
+    private RoleRepository roleRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     public Member getMemberById(Long memberId) {
         return memberRepository.findById(memberId)
@@ -78,6 +85,25 @@ public class MemberService {
         member.setMembershipType(membershipType.toString());
         member.setDepartment(department.toString());
 
+        return memberRepository.save(member);
+    }
+
+    public Member registerMember(Member member) {
+        // Encrypt password before saving
+        String encodedPassword = passwordEncoder.encode(member.getPassword());
+        member.setPassword(encodedPassword);
+
+        // Check if ROLE_USER exists in the database, else create it
+        Role userRole = roleRepository.findByName("ROLE_USER");
+        if (userRole == null) {
+            userRole = new Role("ROLE_USER");
+            roleRepository.save(userRole);
+        }
+
+        // Add the role to the member
+        member.getRoles().add(userRole);
+
+        // Save the member in the database
         return memberRepository.save(member);
     }
 }

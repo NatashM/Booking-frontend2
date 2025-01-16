@@ -40,6 +40,8 @@ public class InitData {
         }
     }
 
+
+
     private void setupMembers() {
         if (memberRepository.count() == 0) {
             Member member1 = new Member();

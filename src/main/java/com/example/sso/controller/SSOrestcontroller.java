@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @CrossOrigin
-@RequestMapping("/api/info") // Basis URL for denne controller
+@RequestMapping("/api/info")
 public class SSOrestcontroller {
 
     private final SSOinfoService ssoinfoService;

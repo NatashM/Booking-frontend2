@@ -21,8 +21,13 @@ public class Member implements UserDetails {
     private String department;
     private String membershipType;
 
-    @OneToMany(mappedBy = "member")
-    private Set<Booking> bookings;
+    @ManyToMany(fetch = FetchType.EAGER)  // This sets up the relationship to Role
+    @JoinTable(
+            name = "member_roles",
+            joinColumns = @JoinColumn(name = "member_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id")
+    )
+    private Set<Role> roles = new HashSet<>();  // Collection of roles assigned to the member
 
     public Member() {}
 
@@ -86,15 +91,17 @@ public class Member implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        // Returner brugerens roller som authorities. Du kan udvide dette senere.
+        // Return roles as authorities
         Set<GrantedAuthority> authorities = new HashSet<>();
-        authorities.add(() -> "ROLE_" + membershipType); // Antag at membershipType bestemmer rollen
+        for (Role role : roles) {
+            authorities.add(() -> "ROLE_" + role.getName()); // Add role as authority
+        }
         return authorities;
     }
 
     @Override
     public String getUsername() {
-        return email; // Brug email som brugernavn
+        return email; // Use email as username
     }
 
     @Override
@@ -115,5 +122,13 @@ public class Member implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
+    }
+
+    public Set<Role> getRoles() {
+        return roles;  // Getter for roles
+    }
+
+    public void setRoles(Set<Role> roles) {
+        this.roles = roles;  // Setter for roles
     }
 }
