@@ -11,6 +11,8 @@ public class Station {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String name;
+
     private double latitude;
     private double longitude;
 
@@ -21,7 +23,8 @@ public class Station {
     public Station() {
     }
 
-    public Station(double latitude, double longitude) {
+    public Station(String name,double latitude, double longitude) {
+        this.name = name;
         this.latitude = latitude;
         this.longitude = longitude;
     }
@@ -56,6 +59,14 @@ public class Station {
 
     public void setDrones(List<Drone> drones) {
         this.drones = drones;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public void addDrone(Drone drone) {

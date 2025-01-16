@@ -12,8 +12,9 @@ public class Drone {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true, nullable = false)
+    @Column(unique = true, nullable = false, columnDefinition = "BINARY(16)")
     private UUID serialNumber;
+
 
     @ManyToOne
     private Station station;
