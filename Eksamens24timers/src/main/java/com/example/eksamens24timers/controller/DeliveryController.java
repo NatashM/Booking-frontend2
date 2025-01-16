@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/deliveries")
@@ -31,7 +32,7 @@ public class DeliveryController {
     }
 
     @PostMapping("/schedule")
-    public Delivery scheduleDelivery(@RequestParam Long deliveryId, @RequestParam(required = false) Long droneSerialNumber) {
+    public Delivery scheduleDelivery(@RequestParam Long deliveryId, @RequestParam(required = true) Long droneSerialNumber) {
         return deliveryService.scheduleDelivery(deliveryId, droneSerialNumber);
     }
 
