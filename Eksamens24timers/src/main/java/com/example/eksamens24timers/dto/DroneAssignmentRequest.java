@@ -4,7 +4,7 @@ public class DroneAssignmentRequest {
 
     private Long droneId;
 
-    // Getters and setters
+
     public Long getDroneId() {
         return droneId;
     }

@@ -5,7 +5,7 @@ public class DeliveryRequest {
     private String pizzaName;
     private String address;
 
-    // Getters and setters
+
 
 
     public String getPizzaName() {

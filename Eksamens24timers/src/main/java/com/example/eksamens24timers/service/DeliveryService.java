@@ -33,19 +33,13 @@ public class DeliveryService {
     }
 
     public Delivery addDelivery(String title, String address) {
-        // Fetch the pizza from the repository using pizzaName
+
         Pizza pizza = pizzaRepository.findByTitle(title)
                 .orElseThrow(() -> new RuntimeException("Pizza not found"));
-
-        // Create a new Delivery object and set the pizza and address
         Delivery delivery = new Delivery();
         delivery.setPizza(pizza);
         delivery.setAddress(address);
-
-        // Set the expected delivery time to 30 minutes from now
         delivery.setExpectedDeliveryTime(LocalDateTime.now().plusMinutes(30));
-
-        // Save the delivery object in the repository and return it
         return deliveryRepository.save(delivery);
     }
 
@@ -54,7 +48,7 @@ public class DeliveryService {
                 .orElseThrow(() -> new RuntimeException("Delivery not found"));
 
         if (delivery.getDrone() != null) {
-            throw new RuntimeException("Delivery already has a drone assigned.");
+            throw new RuntimeException("Delivery has a drone assigned.");
         }
 
         Drone drone = droneRepository.findById(droneSerialNumber)
@@ -86,9 +80,8 @@ public class DeliveryService {
     }
 
     public void saveDelivery(Delivery delivery) {
-        deliveryRepository.save(delivery);  // Save the delivery to the database
+        deliveryRepository.save(delivery);
     }
-
 
 
 }

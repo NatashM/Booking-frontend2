@@ -30,14 +30,12 @@ public class initData {
 
     @PostConstruct
     public void init() {
-        // Initialisering af Stationer
         if (stationRepository.count() == 0) {
             stationRepository.save(new Station("København V", 55.41, 12.34));
             stationRepository.save(new Station("København K", 55.43, 12.35));
             stationRepository.save(new Station("Vesterbro", 55.42, 12.33));
         }
 
-        // Initialisering af Pizzaer
         if (pizzaRepository.count() == 0) {
             pizzaRepository.save(new Pizza("Margarita", 90));
             pizzaRepository.save(new Pizza("Pepperoni", 100));
@@ -46,7 +44,7 @@ public class initData {
             pizzaRepository.save(new Pizza("Bolognese", 120));
         }
 
-        // Initialisering af Droner
+
         if (droneRepository.count() == 0) {
             Drone drone1 = new Drone();
             drone1.setSerialNumber(UUID.randomUUID());
@@ -61,7 +59,7 @@ public class initData {
             droneRepository.save(drone2);
         }
 
-        // Initialisering af Leverancer
+
         if (deliveryRepository.count() == 0) {
             Optional<Drone> drone1 = droneRepository.findById(1L);
             Optional<Drone> drone2 = droneRepository.findById(2L);

@@ -30,7 +30,7 @@ public class DroneService {
     public Drone addDrone() {
         List<Station> stations = stationRepository.findAll();
         if (stations.isEmpty()) {
-            throw new IllegalStateException("Ingen stationer tilgængelige for at tilføje en drone.");
+            throw new IllegalStateException("No station are able to add a drone.");
         }
 
         Station chosenStation = stations.stream()

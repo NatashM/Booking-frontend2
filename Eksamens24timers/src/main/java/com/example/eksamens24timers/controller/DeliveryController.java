@@ -40,7 +40,6 @@ public class DeliveryController {
 
     @PostMapping("/add")
     public ResponseEntity<Delivery> addDelivery(@RequestBody DeliveryRequest deliveryRequest) {
-        // Handle the pizzaName instead of pizzaId
         Delivery savedDelivery = deliveryService.addDelivery(deliveryRequest.getPizzaName(), deliveryRequest.getAddress());
         return ResponseEntity.status(HttpStatus.CREATED).body(savedDelivery);
     }
@@ -49,37 +48,36 @@ public class DeliveryController {
 
     @PostMapping("/{id}/schedule")
     public ResponseEntity<Delivery> scheduleDelivery(@PathVariable Long id, @RequestBody DroneAssignmentRequest request) {
-        // Fetch the delivery
         Delivery delivery = deliveryService.getDeliveryById(id);
         if (delivery == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
 
-        // Check if droneId is null in the request
+
         Long droneId = request.getDroneId();
         if (droneId == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(null);  // Just return a null body (you can customize this if needed)
+                    .body(null);
         }
 
-        // Fetch the drone using the provided droneId
+
         Drone drone = droneService.getDroneById(droneId);
         if (drone == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(null);  // Just return a null body (you can customize this if needed)
+                    .body(null);
         }
 
-        // Assign the drone to the delivery
+
         delivery.setDrone(drone);
 
-        // Save the updated delivery
+
         deliveryService.saveDelivery(delivery);
 
-        // Return the updated delivery object as a response
+
         return ResponseEntity.ok(delivery);
     }
 
-    // Assuming you're using Spring Boot for the backend
+
     @PostMapping("/{id}/update-status")
     public ResponseEntity<?> updateDeliveryStatus(@PathVariable Long id, @RequestBody Map<String, String> statusUpdate) {
         Delivery delivery = deliveryService.getDeliveryById(id);
