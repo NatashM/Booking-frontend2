@@ -16,7 +16,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/drones")
-@CrossOrigin("http://localhost:63342")
+@CrossOrigin("*")
 public class DroneController {
 
 
@@ -32,8 +32,10 @@ public class DroneController {
     @PostMapping("/add")
     public ResponseEntity<Drone> addDrone() {
         Drone drone = droneService.addDrone();
+        System.out.println("Added Drone: " + drone); // Log for debug
         return ResponseEntity.status(HttpStatus.CREATED).body(drone);
     }
+
 
     @PostMapping("/enable")
     public ResponseEntity<Void> enableDrone(@RequestParam Long serialNumber) {

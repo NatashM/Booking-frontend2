@@ -1,9 +1,6 @@
 package com.example.eksamens24timers.service;
 
-import com.example.eksamens24timers.model.Delivery;
-import com.example.eksamens24timers.model.Drone;
-import com.example.eksamens24timers.model.DroneStatus;
-import com.example.eksamens24timers.model.Pizza;
+import com.example.eksamens24timers.model.*;
 import com.example.eksamens24timers.repository.DeliveryRepository;
 import com.example.eksamens24timers.repository.DroneRepository;
 import com.example.eksamens24timers.repository.PizzaRepository;
@@ -91,5 +88,7 @@ public class DeliveryService {
     public void saveDelivery(Delivery delivery) {
         deliveryRepository.save(delivery);  // Save the delivery to the database
     }
+
+
 
 }

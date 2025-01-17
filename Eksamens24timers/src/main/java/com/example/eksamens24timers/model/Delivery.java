@@ -26,6 +26,8 @@ public class Delivery {
     @ManyToOne
     private Pizza pizza;
 
+    @Enumerated(EnumType.STRING)
+    private DeliveryStatus deliveryStatus;
     private String address;
     private LocalDateTime expectedDeliveryTime;
     private LocalDateTime actualDeliveryTime;
@@ -44,6 +46,14 @@ public class Delivery {
 
     public void setDrone(Drone drone) {
         this.drone = drone;
+    }
+
+    public DeliveryStatus getDeliveryStatus() {
+        return deliveryStatus;
+    }
+
+    public void setDeliveryStatus(DeliveryStatus deliveryStatus) {
+        this.deliveryStatus = deliveryStatus;
     }
 
     public Pizza getPizza() {
