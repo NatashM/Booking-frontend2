@@ -88,4 +88,8 @@ public class DeliveryService {
                 .orElseThrow(() -> new RuntimeException("Delivery not found"));
     }
 
+    public void saveDelivery(Delivery delivery) {
+        deliveryRepository.save(delivery);  // Save the delivery to the database
+    }
+
 }

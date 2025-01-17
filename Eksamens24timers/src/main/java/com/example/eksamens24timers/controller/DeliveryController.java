@@ -1,8 +1,11 @@
 package com.example.eksamens24timers.controller;
 
 import com.example.eksamens24timers.dto.DeliveryRequest;
+import com.example.eksamens24timers.dto.DroneAssignmentRequest;
 import com.example.eksamens24timers.model.Delivery;
+import com.example.eksamens24timers.model.Drone;
 import com.example.eksamens24timers.service.DeliveryService;
+import com.example.eksamens24timers.service.DroneService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +20,9 @@ import java.util.UUID;
 public class DeliveryController {
     @Autowired
     private DeliveryService deliveryService;
+
+    @Autowired
+    private DroneService droneService;
 
     @GetMapping
     public ResponseEntity<List<Delivery>> getAllDeliveries() {
@@ -39,11 +45,42 @@ public class DeliveryController {
 
 
 
-    @PostMapping("/schedule")
-    public ResponseEntity<Delivery> scheduleDelivery(@RequestParam Long deliveryId, @RequestParam Long droneSerialNumber) {
-        Delivery scheduledDelivery = deliveryService.scheduleDelivery(deliveryId, droneSerialNumber);
-        return ResponseEntity.ok(scheduledDelivery);
+    @PostMapping("/{id}/schedule")
+    public ResponseEntity<?> scheduleDelivery(@PathVariable Long id, @RequestBody DroneAssignmentRequest request) {
+        // Fetch the delivery
+        Delivery delivery = deliveryService.getDeliveryById(id);
+        if (delivery == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("Delivery not found");  // Return a message when the delivery is not found
+        }
+
+        // Check if droneId is null in the request
+        Long droneId = request.getDroneId();
+        if (droneId == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Drone ID is missing");  // Return a message when droneId is missing
+        }
+
+        // Fetch the drone using the provided droneId
+        Drone drone = droneService.getDroneById(droneId);
+        if (drone == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Drone not found for ID: " + droneId);  // Return a message when the drone is not found
+        }
+
+        // Assign the drone to the delivery
+        delivery.setDrone(drone);
+
+        // Save the updated delivery
+        deliveryService.saveDelivery(delivery);
+
+        // Return the updated delivery object as a response
+        return ResponseEntity.ok(delivery);
     }
+
+
+
+
 
     @PostMapping("/finish")
     public ResponseEntity<Void> finishDelivery(@RequestParam Long deliveryId) {
