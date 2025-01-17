@@ -85,7 +85,8 @@ document.getElementById("add-drone-btn").addEventListener("click", async () => {
     try {
         const response = await fetch(`${baseUrl}/drones/add`, {
             method: "POST",
-            headers: { "Content-Type": "application/json" }
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ serialNumber: "NewSerial001", status: "Idle" }) // Example data for drone
         });
         if (response.ok) {
             alert("Drone added successfully!");
