@@ -1,44 +1,49 @@
-const baseUrl = "http://localhost:8080"; // Erstat med din backend's URL
+const baseUrl = "http://localhost:8080";
 
-// Fetch and display deliveries
+
 async function fetchDeliveries() {
     try {
         const response = await fetch(`${baseUrl}/deliveries`);
         if (!response.ok) {
-            throw new Error("Failed to fetch deliveries");
+            throw new Error('Failed to fetch deliveries');
         }
         const deliveries = await response.json();
-        const deliveryList = document.getElementById("delivery-list");
+        console.log('Fetched deliveries:', deliveries); //
 
-        // Sort deliveries by creation time (oldest first)
-        deliveries.sort((a, b) => new Date(a.creationTime) - new Date(b.creationTime));
-
+        const deliveryList = document.getElementById('delivery-list');
         deliveryList.innerHTML = deliveries
+            .filter(delivery => delivery.status !== 'DELIVERED')
             .map(delivery => {
-                return `<tr>
+                console.log(`Delivery ID: ${delivery.id}, Status: ${delivery.status}`);
+
+                return `<tr data-id="${delivery.id}">
                     <td>${delivery.id}</td>
                     <td>${delivery.address}</td>
-                    <td>${delivery.pizza.title || 'Ingen pizza valgt'}</td>
+                    <td>${delivery.pizza ? delivery.pizza.title : 'Ingen pizza valgt'}</td>
                     <td>${delivery.status || 'Pending'}</td>
                     <td>
-                        ${delivery.status === 'Pending' ?
-                    `<button onclick="assignDrone(${delivery.id})">Tildel Drone</button>` : ''}
-                        ${delivery.status === 'Assigned' ?
-                    `<button onclick="markAsDelivered(${delivery.id})">Afslut Levering</button>` : ''}
+                        ${!delivery.drone ?
+                    `<button class="assign-drone" onclick="assignDroneToDelivery(${delivery.id})">Tildel Drone</button>` :
+                    `Drone Serial: ${delivery.drone.serialNumber}`}
+                        ${delivery.status === 'IN_PROGRESS' ?
+                    `<button onclick="markAsDelivered(${delivery.id})">Afslut Levering</button>`
+                    : ''}
                     </td>
                 </tr>`;
             })
-            .join("");
+            .join('');
     } catch (error) {
-        console.error("Error fetching deliveries:", error);
-        alert("Failed to fetch deliveries.");
+        console.error('Error fetching deliveries:', error);
     }
 }
+
+
+
 
 // Add a new delivery
 document.getElementById("add-delivery-form").addEventListener("submit", async (e) => {
     e.preventDefault();
-    const pizzaName = document.getElementById("pizzaName").value;  // Get pizza name from dropdown
+    const pizzaName = document.getElementById("pizzaName").value;
     const address = document.getElementById("address").value;
 
     try {
@@ -49,8 +54,8 @@ document.getElementById("add-delivery-form").addEventListener("submit", async (e
         });
         if (response.ok) {
             alert("Delivery added successfully!");
-            document.getElementById("add-delivery-form").reset(); // Clear the form fields
-            fetchDeliveries(); // Refresh the delivery list
+            document.getElementById("add-delivery-form").reset();
+            fetchDeliveries();
         } else {
             const errorMessage = await response.text();
             console.error("Failed to add delivery:", errorMessage);
@@ -70,13 +75,24 @@ async function fetchDrones() {
             throw new Error("Failed to fetch drones");
         }
         const drones = await response.json();
+
+        const availableDrones = drones.filter(drone => drone.status === "IN_OPERATION" || drone.status === "Idle");
+
         const droneList = document.getElementById("drone-list");
-        droneList.innerHTML = drones
-            .map(drone => `<p>Drone Serial: ${drone.serialNumber}, Status: ${drone.status}</p>`)
-            .join("");
+        droneList.innerHTML = `
+    <h3>All Drones</h3>
+    ${drones.map(drone => `<p>Drone Serial: ${drone.serialNumber}, Status: ${drone.status}</p>`).join("")}
+  
+    ${availableDrones.length > 0
+            ? availableDrones.map(drone => `<p>Drone Serial: ${drone.serialNumber}, Status: ${drone.status}</p>`).join("")
+            : "<p>No available drones</p>"
+        }
+`;
+        return availableDrones;
     } catch (error) {
         console.error("Error fetching drones:", error);
         alert("Failed to fetch drones.");
+        return [];
     }
 }
 
@@ -85,12 +101,11 @@ document.getElementById("add-drone-btn").addEventListener("click", async () => {
     try {
         const response = await fetch(`${baseUrl}/drones/add`, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ serialNumber: "NewSerial001", status: "Idle" }) // Example data for drone
+            headers: { "Content-Type": "application/json" }
         });
         if (response.ok) {
             alert("Drone added successfully!");
-            fetchDrones(); // Refresh the drone list
+            fetchDrones();
         } else {
             console.error("Failed to add drone:", response.statusText);
             alert("Failed to add drone.");
@@ -101,51 +116,102 @@ document.getElementById("add-drone-btn").addEventListener("click", async () => {
     }
 });
 
-// Assign drone to delivery
-async function assignDrone(deliveryId) {
+
+async function assignDroneToDelivery(deliveryId) {
     try {
-        const response = await fetch(`${baseUrl}/deliveries/${deliveryId}/assign-drone`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" }
-        });
-        if (response.ok) {
-            alert("Drone assigned successfully!");
-            fetchDeliveries(); // Refresh the delivery list
+        const availableDrones = await fetchDrones();
+        if (availableDrones.length > 0) {
+            const droneId = availableDrones[0].id;
+            const response = await fetch(`${baseUrl}/deliveries/${deliveryId}/schedule`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ droneId }),
+            });
+
+            if (!response.ok) {
+                const errorDetails = await response.json();
+                throw new Error(`Fejl ved tildeling af drone: ${JSON.stringify(errorDetails)}`);
+            }
+
+            // Successfully assigned drone, update status to 'IN_PROGRESS'
+            const updateResponse = await fetch(`${baseUrl}/deliveries/${deliveryId}/update-status`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ status: 'IN_PROGRESS' })
+            });
+
+            if (updateResponse.ok) {
+                console.log('Delivery status updated to IN_PROGRESS');
+
+
+                const deliveryRow = document.querySelector(`tr[data-id='${deliveryId}']`);
+                if (deliveryRow) {
+                    const statusCell = deliveryRow.querySelector('td:nth-child(4)');
+                    if (statusCell) {
+                        statusCell.textContent = 'IN_PROGRESS';
+                    }
+                }
+            } else {
+                const errorMessage = await updateResponse.text();
+                console.error('Failed to update status:', errorMessage);
+                alert('Failed to update delivery status');
+            }
         } else {
-            console.error("Failed to assign drone:", response.statusText);
-            alert("Failed to assign drone.");
+            alert("No available drones to assign.");
         }
     } catch (error) {
-        console.error("Error assigning drone:", error);
-        alert("An unexpected error occurred.");
+        console.error(error);
+        alert("An error occurred while assigning the drone.");
     }
 }
 
-// Mark delivery as delivered
+
+
 async function markAsDelivered(deliveryId) {
     try {
-        const response = await fetch(`${baseUrl}/deliveries/${deliveryId}/mark-delivered`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" }
+        const response = await fetch(`${baseUrl}/deliveries/${deliveryId}/update-status`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ status: 'DELIVERED' })
         });
+
         if (response.ok) {
-            alert("Delivery marked as delivered!");
-            fetchDeliveries(); // Refresh the delivery list
+            console.log('Delivery marked as delivered');
+
+
+            const deliveryRow = document.querySelector(`tr[data-id='${deliveryId}']`);
+            if (deliveryRow) {
+                const statusCell = deliveryRow.querySelector('td:nth-child(4)');
+                if (statusCell) {
+                    statusCell.textContent = 'DELIVERED';
+                }
+
+
+                setTimeout(() => {
+                    deliveryRow.remove();
+                }, 500);
+            }
         } else {
-            console.error("Failed to mark as delivered:", response.statusText);
-            alert("Failed to mark as delivered.");
+            const errorMessage = await response.text();
+            console.error('Failed to mark delivery as delivered:', errorMessage);
+            alert('Failed to mark delivery as delivered');
         }
     } catch (error) {
-        console.error("Error marking as delivered:", error);
-        alert("An unexpected error occurred.");
+        console.error(error);
+        alert("An error occurred while marking the delivery as delivered.");
     }
 }
 
-// Initialize page with deliveries and drones
-function init() {
-    fetchDeliveries(); // Fetch initial list of deliveries
-    fetchDrones(); // Fetch initial list of drones
-    setInterval(() => fetchDeliveries(), 60000); // Refresh the deliveries every 60 seconds
-}
+
+setInterval(() => {
+    fetchDeliveries();
+    fetchDrones();
+}, 60000);
 
 init();
